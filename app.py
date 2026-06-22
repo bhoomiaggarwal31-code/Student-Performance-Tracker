@@ -1,10 +1,8 @@
 import streamlit as st
-import pickle
-import pandas as pd
+from SRC.predict import predict_score
+from SRC.utils import get_performance_category
 
-# Load Model
-with open("MODELS/student_performance_model.pkl", "rb") as file:
-    model = pickle.load(file)
+
 
 st.title("🎓 Student Performance Tracker")
 
@@ -19,14 +17,17 @@ tutoring_sessions = st.slider("Tutoring Sessions", 0, 10, 2)
 
 if st.button("Predict Score"):
 
-    input_data = pd.DataFrame({
-        "Hours_Studied": [hours_studied],
-        "Attendance": [attendance],
-        "Previous_Scores": [previous_scores],
-        "Sleep_Hours": [sleep_hours],
-        "Tutoring_Sessions": [tutoring_sessions]
-    })
+    input_data_dict = {
+        "Hours_Studied": hours_studied,
+        "Attendance": attendance,
+        "Previous_Scores": previous_scores,
+        "Sleep_Hours": sleep_hours,
+        "Tutoring_Sessions": tutoring_sessions
+    }
 
-    prediction = model.predict(input_data)
+    score = predict_score(input_data_dict)
 
-    st.success(f"Predicted Exam Score: {prediction[0]:.2f}")
+    category = get_performance_category(score)
+
+    st.success(f"Predicted Exam Score: {score:.2f}")
+    st.info(f"Performance Category: {category}")
